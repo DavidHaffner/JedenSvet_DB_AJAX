@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta content="text/html; charset=utf-8">
+    <title>formulář DB Jeden svět</title>
+  </head>
+  <style>
+     th {width: 250px; color:solid; text-align:left;}
+  </style>
+  <body>
+    <h3>Formulář pro práci s databází Jeden svět</h3>
+    <form>
+      Přihlašovací jméno:<br>
+      <input type="text" name="user_name"><br>
+      Heslo:<br>
+      <input type="text" name="password"><br>
+      <br>
+      
+      Vyberte službu:<br>
+      <input type="radio" name="db_service" value="1"> vložení nového záznamu<br>
+      <input type="radio" name="db_service" value="2"> dotaz na záznam<br>
+      <input type="radio" name="db_service" value="3"> úprava záznamu<br>
+      <br>
+      
+      <table>
+        <tr>
+          <th>Pro vložení:</th>
+          <th>Pro dotaz:</th>
+          <th>Pro úpravu:</th>
+        </tr>>  
+        <tr>
+          <td>
+            Jméno filmu:<br>
+            <input type="text" name="movie_name"><br>
+            Rok:<br>
+            <input type="text" name="year"><br>
+            Režisér:<br>
+            <input type="text" name="director"><br>
+            Popis:<br>
+            <input type="text" name="description"><br>
+          </td>  
+          <td>  
+            <input type="radio" name="columnDB" value="idfilmu" checked> podle ID filmu<br>
+            <input type="radio" name="columnDB" value="movie_name"> podle názvu<br>
+            <input type="radio" name="columnDB" value="year"> podle roku<br>
+            <input type="radio" name="columnDB" value="director"> podle režiséra<br>
+            <br>
+            Hodnota:<br>
+            <input type="text" name="insertValue"><br>
+          </td>
+          <td>  
+            
+          </td>  
+        </tr>
+      </table>
+      <br><br><br>
+      <input type="submit" value="Submit"><br><br><br>
+    </form>
+    
+    <h3>Odpověď z DB serveru:</h3><br>
+    <p id="httpResponse"></p>    
+  
+    <script>
+       window.onload = function() {
+         var requestText = "";
+         // načtení requestTextu z formuláře
+         
+         
+         var xmlhttp = new XMLHttpRequest();
+         xmlhttp.onreadystatechange = function() {
+            if (this.readyState==4 && this.status==200) {
+              var myObj = JSON.parse(this.responseText);
+              document.getElementById("httpResponse").innerHTML = myObj.text;
+            };  
+         };
+         xmlhttp.open("GET", requestText, true);
+         xmlhttp.send();
+       }; 
+    </script>
+  </body>
+</html>

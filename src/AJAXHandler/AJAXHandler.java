@@ -43,18 +43,18 @@ public class AJAXHandler extends ParseMessage implements Runnable {
     @Override
     public void run() {
 
-        String choice; // zde se bude ukládat příchozí komunikace od AJAX
+        String requestText; // zde se uloží příchozí request od AJAX
         boolean quit = false; // pomocná prom. pro plnění podmínek v cyklech
-        String response; // zde bude výsledek selectu z DB
+        String response; // zde bude výsledek z DB
             
         try {
             while (!quit) {
                 // ověření přístupu do DB -> z tabulky 'pristupy'
                 write("Aplikace JedenSvet_DB:  zadejte své jméno/heslo...\n");
-                choice = read("", "\n");
-                choice = choice.trim();
+                requestText = read("", "\n");
+                requestText = requestText.trim();
                 
-                String[] parsed = choice.split("/");
+                String[] parsed = requestText.split("/");
                 response = dBController.doSelectFromPristupy(parsed[0]);
 
                 if (response.equals(parsed[1])) {
@@ -80,10 +80,10 @@ public class AJAXHandler extends ParseMessage implements Runnable {
                 // pořadí sloupců: idFilmu, jmenoFilmu, rok, reziser, popis
                 write("Vložte svůj příkaz...\n");
 
-                choice = read("", "\n");
-                choice = choice.trim();
+                requestText = read("", "\n");
+                requestText = requestText.trim();
 
-                String[] parsed = choice.split("/");
+                String[] parsed = requestText.split("/");
 
                 String[] filmData = {"", "", "", "", ""};
                 int radku;
@@ -124,9 +124,9 @@ public class AJAXHandler extends ParseMessage implements Runnable {
                 write(response + "\n");
 
                 write("Pokračovat? (K pro konec): \n");
-                choice = read("", "\n");
+                requestText = read("", "\n");
 
-                if ('K' == choice.charAt(0)) {
+                if ('K' == requestText.charAt(0)) {
                     quit = true;
                 }
             } 

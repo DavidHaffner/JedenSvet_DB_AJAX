@@ -4,7 +4,7 @@
     <meta content="text/html; charset=utf-8">
     <title>formulář DB Jeden svět</title>
     <style>
-       th {width: 250px; color:solid; text-align:left;}
+       th {width:250px; color:solid; text-align:left;}
     </style>
   </head>
   
@@ -12,9 +12,9 @@
     <h3>Formulář pro práci s databází Jeden svět</h3>
     <form>
       Přihlašovací jméno:<br>
-      <input type="text" name="userName"><br>
+      <input type="text" id="userName"><br>
       Heslo:<br>
-      <input type="text" name="password"><br>
+      <input type="text" id="password"><br>
       <br>
       
       Vyberte službu:<br>
@@ -28,95 +28,118 @@
           <th>Pro vložení:</th>
           <th>Pro dotaz:</th>
           <th>Pro úpravu:</th>
-        </tr>>  
+        </tr>  
         <tr>
           <td>
             Jméno filmu:<br>
-            <input type="text" name="movieName"><br>
+            <input type="text" id="movieName"><br>
             Rok:<br>
-            <input type="text" name="year"><br>
+            <input type="text" id="year"><br>
             Režisér:<br>
-            <input type="text" name="director"><br>
+            <input type="text" id="director"><br>
             Popis:<br>
-            <input type="text" name="description"><br>
+            <input type="text" id="description"><br>
           </td>  
           <td> 
-            <input type="radio" name="columnDB" value="2"> podle názvu<br>
-            <input type="radio" name="columnDB" value="3"> podle roku<br>
-            <input type="radio" name="columnDB" value="4"> podle režiséra<br>
-            <input type="radio" name="columnDB" value="5"> podle popisu<br>
+            <input type="radio" name="columnDBinsert" value="2"> podle názvu<br>
+            <input type="radio" name="columnDBinsert" value="3"> podle roku<br>
+            <input type="radio" name="columnDBinsert" value="4"> podle režiséra<br>
+            <input type="radio" name="columnDBinsert" value="5"> podle popisu<br>
             <br>
             Hodnota:<br>
-            <input type="text" name="insertValue"><br>
+            <input type="text" id="insertValue"><br>
           </td>
           <td>  
             Id filmu:<br>
-            <input type="text" name="movieID"><br>
-            <input type="radio" name="columnDB" value="2"> změna názvu<br>
-            <input type="radio" name="columnDB" value="3"> změna roku<br>
-            <input type="radio" name="columnDB" value="4"> změna režiséra<br>
-            <input type="radio" name="columnDB" value="5"> změna popisu<br>
+            <input type="text" id="movieID"><br>
+            <input type="radio" name="columnDBupdate" value="2"> změna názvu<br>
+            <input type="radio" name="columnDBupdate" value="3"> změna roku<br>
+            <input type="radio" name="columnDBupdate" value="4"> změna režiséra<br>
+            <input type="radio" name="columnDBupdate" value="5"> změna popisu<br>
             Nová hodnota:<br>
-            <input type="text" name="updateValue"><br>
+            <input type="text" id="updateValue"><br>
           </td>  
         </tr>
       </table>
       <br><br><br>
-      <input type="submit" value="Submit" name="submit"><br><br><br>
+      <input type="button" value="Submit" id="submit"><br><br><br>
     </form>
     
     <h3>Odpověď z DB serveru:</h3><br>
     <p id="httpResponse"></p>    
   
     <script>
-       window.onload = function() {
-         var requestURI = "http://localhost:9000/echoGet";
+      window.onload = function() {
+        var requestURI = "http://localhost:9000/echoGet";
          
-         var userName = document.getElementByName("userName");
-         var password = document.getElementByName("password");
-         var dbService = document.getElementByName("dbService");
-         var movieName = document.getElementByName("movieName");
-         var year = document.getElementByName("year");
-         var director = document.getElementByName("director");
-         var description = document.getElementByName("description");
-         var columnDB = document.getElementByName("columnDB");
-         var insertValue = document.getElementByName("insertValue");
-         var movieID = document.getElementByName("movieID");
-         var updateValue = document.getElementByName("updateValue");
+        var userName = document.getElementById("userName");
+        var password = document.getElementById("password");
+        
+        var poleDBS = document.getElementsByName("dbService");
+        for (i=0; i < poleDBS.length; i++) {
+          if (poleDBS[i].checked) {
+             var dbService = poleDBS[i];
+          };
+        };
+        
+        var movieName = document.getElementById("movieName");
+        var year = document.getElementById("year");
+        var director = document.getElementById("director");
+        var description = document.getElementById("description");
+        
+        var poleCDBI = document.getElementsByName("columnDBinsert");
+        for (i=0; i < poleCDBI.length; i++) {
+          if (poleCDBI[i].checked) {
+             var columnDBI = poleCDBI[i];
+          };
+        };
+        var insertValue = document.getElementById("insertValue");
+        
+        var movieID = document.getElementById("movieID");
+        var poleCDBU = document.getElementsByName("columnDBupdate");
+        for (i=0; i < poleCDBU.length; i++) {
+          if (poleCDBU[i].checked) {
+             var columnDBU = poleCDBU[i];
+          };
+        };
+        var updateValue = document.getElementById("updateValue");
          
-         requestURI += "?userName=" + userName
-                    + "&password=" + password;
+           
+        var submit = document.getElementById("submit");
+        submit.onclick = function() { 
+        
+            requestURI += "?userName=" + userName
+                    + "&password=" + password;  
          
-         if (dbService ==1) {
-             requestURI += "&dbService=" + dbService
-                        + "&movieName=" + movieName
-                        + "&year=" + year
-                        + "&director=" + director
-                        + "&description=" + description;
-         } else if (dbService ==2) {
-             requestURI += "&dbService=" + dbService
-                        + "&columnDB=" + columnDB
-                        + "&insertValue=" + insertValue;
-         } else if (dbService ==3) {
-             requestURI += "&dbService=" + dbService
-                        + "&movieID=" + movieID
-                        + "&columnDB=" + columnDB
-                        + "&updateValue=" + updateValue;
-         } else {
-             document.write("Chyba: není zadaná služba.");
-         };
+            if (dbService === 1) {
+                requestURI += "&dbService=" + dbService
+                           + "&movieName=" + movieName
+                           + "&year=" + year
+                           + "&director=" + director
+                           + "&description=" + description;
+            } else if (dbService === 2) {
+                requestURI += "&dbService=" + dbService
+                           + "&columnDB=" + columnDB
+                           + "&insertValue=" + insertValue;
+            } else if (dbService === 3) {
+                requestURI += "&dbService=" + dbService
+                           + "&movieID=" + movieID
+                           + "&columnDB=" + columnDB
+                           + "&updateValue=" + updateValue;
+            } else {
+                document.write("Chyba: není zadaná služba.");
+            };
          
          
-         var submit = document.getElementByName("submit");
-         submit.onclick = function(requestURI) {
-             var xmlhttp = new XMLHttpRequest();
-             xmlhttp.onreadystatechange = function() {
-                  document.getElementById("httpResponse").innerHTML = this.responseText;
-             };
-             xmlhttp.open("GET", requestURI, true);
-             xmlhttp.send();
-         };   
-       }; 
+         
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                document.getElementById("httpResponse").innerHTML = this.responseText;
+            };
+            xmlhttp.open("GET", requestURI, true);
+            xmlhttp.send();
+        };   
+      }; 
     </script>
   </body>
 </html>

@@ -9,59 +9,39 @@ package AJAXHandler;
 
 import DBController.DBController;
 import MyLogger.MyLogger;
-import java.net.Socket;
-import java.io.IOException;
+import java.util.Map;
+
 
 /**
  *
  * @author dhaffner
  */
-public class AJAXHandler extends ParseMessage implements Runnable {
+public class AJAXHandler extends ParseMessage {
 
-    Socket sock;
-    int id;
     DBController dBController = new DBController();
     MyLogger myLogger = new MyLogger();
     
-
-    public AJAXHandler(Socket iSocket, int iID) throws IOException {
-        sock = iSocket;
-        id = iID;
-        out = sock.getOutputStream();
-        in = sock.getInputStream();
-
-    }
-
-    public void start() {
-        new Thread(this).start();
-    }
-
+   
     void log(String str) {
         System.out.println(str);
     }
 
-    @Override
-    public void run() {
+    public String doDBRequest(Map<String, String> parameters) {
 
-        String requestText; // zde se uloží příchozí request od AJAX
         boolean quit = false; // pomocná prom. pro plnění podmínek v cyklech
-        String response; // zde bude výsledek z DB
-            
+        String dbResponse; // zde bude výsledek z DB
+        String responseText =""; // zde bude odpověď zpět pro Clienta
+        
         try {
             while (!quit) {
                 // ověření přístupu do DB -> z tabulky 'pristupy'
-                write("Aplikace JedenSvet_DB:  zadejte své jméno/heslo...\n");
-                requestText = read("", "\n");
-                requestText = requestText.trim();
-                
-                String[] parsed = requestText.split("/");
-                response = dBController.doSelectFromPristupy(parsed[0]);
+                dbResponse = dBController.doSelectFromPristupy(parameters.get("userName"));
 
-                if (response.equals(parsed[1])) {
-                    write("Ověření OK...\n");
+                if (dbResponse.equals(parameters.get("password"))) {
+                    responseText += "Ověření OK...\n";
                     quit = true;
                 } else {
-                    write("Nepovolený vstup...\n");
+                    responseText += "Nepovolený vstup...\n";
                 }
             }
         } catch (Exception ex) {
@@ -78,63 +58,55 @@ public class AJAXHandler extends ParseMessage implements Runnable {
                 // 2-select:  2/čísloSloupce/hodnota
                 // 3-update:  3/idFilmu/čísloSloupce/hodnota
                 // pořadí sloupců: idFilmu, jmenoFilmu, rok, reziser, popis
-                write("Vložte svůj příkaz...\n");
-
-                requestText = read("", "\n");
-                requestText = requestText.trim();
-
-                String[] parsed = requestText.split("/");
 
                 String[] filmData = {"", "", "", "", ""};
                 int radku;
 
-                switch (parsed[0]) {
+                switch (parameters.get("dbService")) {
                     case "1":
-                        if (! (parsed.length == 5)) {
-                            response = "Chybné zadání.";
+                        if (! (parameters.size() == 7)) {
+                            dbResponse = "Chybné zadání.";
                             break;
                         }
-                        radku = dBController.doInsertToFilm(parsed[1], parsed[2], parsed[3], parsed[4]);
-                        response = "Vloženo řádků: " + Integer.toString(radku);
+                        radku = dBController.doInsertToFilm(parameters.get("movieName"),
+                                parameters.get("year"), 
+                                parameters.get("director"), 
+                                parameters.get("description"));
+                        dbResponse = "Vloženo řádků: " + Integer.toString(radku);
                         break;
                     case "2":
-                        if (! (parsed.length == 3)) {
-                            response = "Chybné zadání.";
+                        if (! (parameters.size() == 5)) {
+                            dbResponse = "Chybné zadání.";
                             break;
                         }
-                        filmData[Integer.parseInt(parsed[1]) - 1] = parsed[2];
-                        response = dBController.doSelectFromFilm(filmData[1], filmData[2], filmData[3], filmData[4]);
+                        filmData[Integer.parseInt(parameters.get("columnDB")) - 1] = parameters.get("insertValue");
+                        dbResponse = dBController.doSelectFromFilm(filmData[1], filmData[2], filmData[3], filmData[4]);
                         // hláška při nenalezení záznamu
-                        if ("".equals(response)) {
-                            response += "Nenalezeno.";
+                        if ("".equals(dbResponse)) {
+                            dbResponse += "Nenalezeno.";
                         }
                         break;
                     case "3":
-                        if (! (parsed.length == 4)) {
-                            response = "Chybné zadání.";
+                        if (! (parameters.size() == 6)) {
+                            dbResponse = "Chybné zadání.";
                             break;
                         }
-                        filmData[Integer.parseInt(parsed[2]) - 1] = parsed[3];
-                        radku = dBController.doUpdateToFilm(parsed[1], filmData[1], filmData[2], filmData[3], filmData[4]);
-                        response = "Upraveno řádků: " + Integer.toString(radku);
+                        filmData[Integer.parseInt(parameters.get("columnDB")) - 1] = parameters.get("updateValue");
+                        radku = dBController.doUpdateToFilm(parameters.get("movieID"), filmData[1], filmData[2], filmData[3], filmData[4]);
+                        dbResponse = "Upraveno řádků: " + Integer.toString(radku);
                         break;
                     default:
-                        response = "Chybné zadání.";
+                        dbResponse = "Chybné zadání.";
                 }
-                write(response + "\n");
+                responseText += dbResponse + "\n";
 
-                write("Pokračovat? (K pro konec): \n");
-                requestText = read("", "\n");
-
-                if ('K' == requestText.charAt(0)) {
-                    quit = true;
-                }
+                quit = true;
             } 
-            sock.shutdownOutput();
-            sock.close();
         } catch (Exception ex) {
             myLogger.saveLog(AJAXHandler.class.getName(), "Chyba v ClientHandleru - při běhu aplikace.", ex);
             //Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, "Error in ClientHandler - application running.", ex);
         }
+        
+        return responseText;
     }
 }

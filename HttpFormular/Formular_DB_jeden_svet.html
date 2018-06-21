@@ -1,25 +1,26 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE>
 <html>
   <head>
     <meta content="text/html; charset=utf-8">
     <title>formulář DB Jeden svět</title>
+    <style>
+       th {width: 250px; color:solid; text-align:left;}
+    </style>
   </head>
-  <style>
-     th {width: 250px; color:solid; text-align:left;}
-  </style>
+  
   <body>
     <h3>Formulář pro práci s databází Jeden svět</h3>
     <form>
       Přihlašovací jméno:<br>
-      <input type="text" name="user_name"><br>
+      <input type="text" name="userName"><br>
       Heslo:<br>
       <input type="text" name="password"><br>
       <br>
       
       Vyberte službu:<br>
-      <input type="radio" name="db_service" value="1"> vložení nového záznamu<br>
-      <input type="radio" name="db_service" value="2"> dotaz na záznam<br>
-      <input type="radio" name="db_service" value="3"> úprava záznamu<br>
+      <input type="radio" name="dbService" value="1"> vložení nového záznamu<br>
+      <input type="radio" name="dbService" value="2"> dotaz na záznam<br>
+      <input type="radio" name="dbService" value="3"> úprava záznamu<br>
       <br>
       
       <table>
@@ -31,7 +32,7 @@
         <tr>
           <td>
             Jméno filmu:<br>
-            <input type="text" name="movie_name"><br>
+            <input type="text" name="movieName"><br>
             Rok:<br>
             <input type="text" name="year"><br>
             Režisér:<br>
@@ -39,22 +40,29 @@
             Popis:<br>
             <input type="text" name="description"><br>
           </td>  
-          <td>  
-            <input type="radio" name="columnDB" value="idfilmu" checked> podle ID filmu<br>
-            <input type="radio" name="columnDB" value="movie_name"> podle názvu<br>
-            <input type="radio" name="columnDB" value="year"> podle roku<br>
-            <input type="radio" name="columnDB" value="director"> podle režiséra<br>
+          <td> 
+            <input type="radio" name="columnDB" value="2"> podle názvu<br>
+            <input type="radio" name="columnDB" value="3"> podle roku<br>
+            <input type="radio" name="columnDB" value="4"> podle režiséra<br>
+            <input type="radio" name="columnDB" value="5"> podle popisu<br>
             <br>
             Hodnota:<br>
             <input type="text" name="insertValue"><br>
           </td>
           <td>  
-            
+            Id filmu:<br>
+            <input type="text" name="movieID"><br>
+            <input type="radio" name="columnDB" value="2"> změna názvu<br>
+            <input type="radio" name="columnDB" value="3"> změna roku<br>
+            <input type="radio" name="columnDB" value="4"> změna režiséra<br>
+            <input type="radio" name="columnDB" value="5"> změna popisu<br>
+            Nová hodnota:<br>
+            <input type="text" name="updateValue"><br>
           </td>  
         </tr>
       </table>
       <br><br><br>
-      <input type="submit" value="Submit"><br><br><br>
+      <input type="submit" value="Submit" name="submit"><br><br><br>
     </form>
     
     <h3>Odpověď z DB serveru:</h3><br>
@@ -62,19 +70,52 @@
   
     <script>
        window.onload = function() {
-         var requestText = "";
-         // načtení requestTextu z formuláře
+         var requestURI = "http://localhost:9000/echoGet";
          
+         var userName = document.getElementByName("userName");
+         var password = document.getElementByName("password");
+         var dbService = document.getElementByName("dbService");
+         var movieName = document.getElementByName("movieName");
+         var year = document.getElementByName("year");
+         var director = document.getElementByName("director");
+         var description = document.getElementByName("description");
+         var columnDB = document.getElementByName("columnDB");
+         var insertValue = document.getElementByName("insertValue");
+         var movieID = document.getElementByName("movieID");
+         var updateValue = document.getElementByName("updateValue");
          
-         var xmlhttp = new XMLHttpRequest();
-         xmlhttp.onreadystatechange = function() {
-            if (this.readyState==4 && this.status==200) {
-              var myObj = JSON.parse(this.responseText);
-              document.getElementById("httpResponse").innerHTML = myObj.text;
-            };  
+         requestURI += "?userName=" + userName
+                    + "&password=" + password;
+         
+         if (dbService ==1) {
+             requestURI += "&dbService=" + dbService
+                        + "&movieName=" + movieName
+                        + "&year=" + year
+                        + "&director=" + director
+                        + "&description=" + description;
+         } else if (dbService ==2) {
+             requestURI += "&dbService=" + dbService
+                        + "&columnDB=" + columnDB
+                        + "&insertValue=" + insertValue;
+         } else if (dbService ==3) {
+             requestURI += "&dbService=" + dbService
+                        + "&movieID=" + movieID
+                        + "&columnDB=" + columnDB
+                        + "&updateValue=" + updateValue;
+         } else {
+             document.write("Chyba: není zadaná služba.");
          };
-         xmlhttp.open("GET", requestText, true);
-         xmlhttp.send();
+         
+         
+         var submit = document.getElementByName("submit");
+         submit.onclick = function(requestURI) {
+             var xmlhttp = new XMLHttpRequest();
+             xmlhttp.onreadystatechange = function() {
+                  document.getElementById("httpResponse").innerHTML = this.responseText;
+             };
+             xmlhttp.open("GET", requestURI, true);
+             xmlhttp.send();
+         };   
        }; 
     </script>
   </body>

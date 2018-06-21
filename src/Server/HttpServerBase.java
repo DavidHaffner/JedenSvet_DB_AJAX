@@ -7,7 +7,6 @@ package Server;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import com.sun.xml.internal.ws.api.message.Headers;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.xml.ws.spi.http.HttpExchange;
 
 /**
  *
@@ -31,6 +29,7 @@ public class HttpServerBase {
     
     /**
      * @param args the command line arguments
+     * @throws java.io.IOException
      */
     public static void main(String[] args) throws IOException {
 
@@ -51,7 +50,7 @@ public class HttpServerBase {
         @Override
         public void handle(com.sun.net.httpserver.HttpExchange he) throws IOException {
 
-            String response = "<h1>Server start success if you see this message</h1>" + "<h1>Port: " + "some port here" + "</h1>";
+            String response = "<h1>Server start success if you see this message</h1>" + "<h1>Port: " + "9000" + "</h1>";
             he.sendResponseHeaders(200, response.length());
             try (OutputStream os = he.getResponseBody()) {
                 os.write(response.getBytes());
@@ -71,7 +70,7 @@ public class HttpServerBase {
             }
             he.sendResponseHeaders(200, response.length());
             OutputStream os = he.getResponseBody();
-            os.write(response.toString().getBytes());
+            os.write(response.getBytes());
             os.close();
 
         }
@@ -80,33 +79,35 @@ public class HttpServerBase {
     public static class EchoGetHandler implements HttpHandler {
 
         @Override
-        public void handle(com.sun.net.httpserver.HttpExchange he) throws IOException {
+        public void handle(com.sun.net.httpserver.HttpExchange httpExch) throws IOException {
             // parse request
-            Map<String, Object> parameters = new HashMap<String, Object>();
-            URI requestedUri = he.getRequestURI();
+            Map<String, Object> parameters = new HashMap<>();
+            URI requestedUri = httpExch.getRequestURI();
             String query = requestedUri.getRawQuery();
             parseQuery(query, parameters);
 
             // send response
             String response = "";
             for (String key : parameters.keySet()) {
-                response += key + " = " + parameters.get(key) + "\n";
+                response += key + " = " + parameters.get(key) + "<br>";
             }
-            he.sendResponseHeaders(200, response.length());
-            OutputStream os = he.getResponseBody();
-            os.write(response.toString().getBytes());
+            httpExch.sendResponseHeaders(200, response.length());
+            OutputStream os = httpExch.getResponseBody();
+            os.write(response.getBytes());
 
             os.close();
         }
 
     }
 
+    
+    // TODO: request&response přes POST není napojeno na AJAXHandler a DB
     public static class EchoPostHandler implements HttpHandler {
 
         @Override
         public void handle(com.sun.net.httpserver.HttpExchange he) throws IOException {
             // parse request
-            Map<String, Object> parameters = new HashMap<String, Object>();
+            Map<String, Object> parameters = new HashMap<>();
             InputStreamReader isr = new InputStreamReader(he.getRequestBody(), "utf-8");
             BufferedReader br = new BufferedReader(isr);
             String query = br.readLine();
@@ -117,7 +118,7 @@ public class HttpServerBase {
             response = parameters.keySet().stream().map((key) -> key + " = " + parameters.get(key) + "\n").reduce(response, String::concat);
             he.sendResponseHeaders(200, response.length());
             OutputStream os = he.getResponseBody();
-            os.write(response.toString().getBytes());
+            os.write(response.getBytes());
             os.close();
         }
     }
@@ -147,7 +148,7 @@ public class HttpServerBase {
                         values.add(value);
 
                     } else if (obj instanceof String) {
-                        List<String> values = new ArrayList<String>();
+                        List<String> values = new ArrayList<>();
                         values.add((String) obj);
                         values.add(value);
                         parameters.put(key, values);

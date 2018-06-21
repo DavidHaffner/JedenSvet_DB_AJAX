@@ -24,8 +24,10 @@ public class JedenSvetServer {
         ServerSocket servsock = new ServerSocket(port);
         while (true) {
             try {
+                /* TODO: předělat na vlákno 
                 new AJAXHandler(servsock.accept(), count++).start();
-            } catch (IOException ex) {
+                */
+            } catch (Exception ex) {
                 myLogger.saveLog(AJAXHandler.class.getName(), "IO chyba při vytváření nového spojení.", ex);
                 //Logger.getLogger(AJAXHandler.class.getName()).log(Level.SEVERE, "IO error in new client", ex);
                 

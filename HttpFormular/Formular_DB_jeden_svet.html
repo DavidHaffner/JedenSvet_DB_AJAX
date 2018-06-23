@@ -62,7 +62,7 @@
         </tr>
       </table>
       <br><br><br>
-      <input type="button" value="Submit" id="submit"><br><br><br>
+      <button id="submit">Submit</button><br><br><br>
     </form>
     
     <h3>Odpověď z DB serveru:</h3><br>
@@ -70,7 +70,7 @@
   
     <script>
       window.onload = function() {
-        var requestURI = "http://localhost:9000/echoGet";
+        var requestURI = "http://localhost:9000/echoGet?test=negat";
          
         var userName = document.getElementById("userName");
         var password = document.getElementById("password");
@@ -108,24 +108,24 @@
         var submit = document.getElementById("submit");
         submit.onclick = function() { 
         
-            requestURI += "?userName=" + userName
-                    + "&password=" + password;  
+            requestURI += "&userName=" + userName.value
+                    + "&password=" + password.value;  
          
-            if (dbService === 1) {
-                requestURI += "&dbService=" + dbService
-                           + "&movieName=" + movieName
-                           + "&year=" + year
-                           + "&director=" + director
-                           + "&description=" + description;
-            } else if (dbService === 2) {
-                requestURI += "&dbService=" + dbService
-                           + "&columnDB=" + columnDB
-                           + "&insertValue=" + insertValue;
-            } else if (dbService === 3) {
-                requestURI += "&dbService=" + dbService
-                           + "&movieID=" + movieID
-                           + "&columnDB=" + columnDB
-                           + "&updateValue=" + updateValue;
+            if (dbService.value == 1) {
+                requestURI += "&dbService=" + dbService.value
+                           + "&movieName=" + movieName.value
+                           + "&year=" + year.value
+                           + "&director=" + director.value
+                           + "&description=" + description.value;
+            } else if (dbService.value == 2) {
+                requestURI += "&dbService=" + dbService.value
+                           + "&columnDB=" + columnDBI.value
+                           + "&insertValue=" + insertValue.value;
+            } else if (dbService.value == 3) {
+                requestURI += "&dbService=" + dbService.value
+                           + "&movieID=" + movieID.value
+                           + "&columnDB=" + columnDBU.value
+                           + "&updateValue=" + updateValue.value;
             } else {
                 document.write("Chyba: není zadaná služba.");
             };

@@ -10,7 +10,7 @@
   
   <body>
     <h3>Formulář pro práci s databází Jeden svět</h3>
-    <form>
+    
       Přihlašovací jméno:<br>
       <input type="text" id="userName"><br>
       Heslo:<br>
@@ -63,24 +63,24 @@
       </table>
       <br><br><br>
       <button id="submit">Submit</button><br><br><br>
-    </form>
+    
     
     <h3>Odpověď z DB serveru:</h3><br>
     <p id="httpResponse"></p>    
   
     <script>
       window.onload = function() {
-        var requestURI = "http://localhost:9000/echoGet?test=negat";
+        var requestURI = "http://localhost:9000/echoGet";
+        
+        var dbService = null;
+        var columnDBI = null;
+        var columnDBU = null;
          
         var userName = document.getElementById("userName");
         var password = document.getElementById("password");
         
         var poleDBS = document.getElementsByName("dbService");
-        for (i=0; i < poleDBS.length; i++) {
-          if (poleDBS[i].checked) {
-             var dbService = poleDBS[i];
-          };
-        };
+        
         
         var movieName = document.getElementById("movieName");
         var year = document.getElementById("year");
@@ -88,28 +88,37 @@
         var description = document.getElementById("description");
         
         var poleCDBI = document.getElementsByName("columnDBinsert");
-        for (i=0; i < poleCDBI.length; i++) {
-          if (poleCDBI[i].checked) {
-             var columnDBI = poleCDBI[i];
-          };
-        };
         var insertValue = document.getElementById("insertValue");
         
         var movieID = document.getElementById("movieID");
         var poleCDBU = document.getElementsByName("columnDBupdate");
-        for (i=0; i < poleCDBU.length; i++) {
-          if (poleCDBU[i].checked) {
-             var columnDBU = poleCDBU[i];
-          };
-        };
         var updateValue = document.getElementById("updateValue");
          
            
         var submit = document.getElementById("submit");
         submit.onclick = function() { 
         
-            requestURI += "&userName=" + userName.value
-                    + "&password=" + password.value;  
+            requestURI += "?userName=" + userName.value
+                    + "&password=" + password.value; 
+                    
+            for (i=0; i < poleDBS.length; i++) {
+                if (poleDBS[i].checked) {
+                    var dbService = poleDBS[i];
+                };
+            };
+            
+            for (i=0; i < poleCDBI.length; i++) {
+                if (poleCDBI[i].checked) {
+                   var columnDBI = poleCDBI[i];
+                };
+            }; 
+            
+            for (i=0; i < poleCDBU.length; i++) {
+                if (poleCDBU[i].checked) {
+                    var columnDBU = poleCDBU[i];
+                };
+            };
+         
          
             if (dbService.value == 1) {
                 requestURI += "&dbService=" + dbService.value

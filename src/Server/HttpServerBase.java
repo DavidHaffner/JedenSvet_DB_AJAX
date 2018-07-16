@@ -5,6 +5,7 @@
  */
 package Server;
 
+import AJAXHandler.AJAXHandler;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import java.io.BufferedReader;
@@ -80,17 +81,24 @@ public class HttpServerBase {
 
         @Override
         public void handle(com.sun.net.httpserver.HttpExchange httpExch) throws IOException {
-            // parse request
+            // parse request to map
             Map<String, Object> parameters = new HashMap<>();
             URI requestedUri = httpExch.getRequestURI();
             String query = requestedUri.getRawQuery();
             parseQuery(query, parameters);
+            
+            // do request to DB using the map with request
+            AJAXHandler ajaxHandler = new AJAXHandler();
+            String response = ajaxHandler.doDBRequest(parameters);
+            
 
-            // send response
+            /*
             String response = "";
             for (String key : parameters.keySet()) {
                 response += key + " = " + parameters.get(key) + "<br>";
             }
+            */
+
             httpExch.sendResponseHeaders(200, response.length());
             OutputStream os = httpExch.getResponseBody();
             os.write(response.getBytes());

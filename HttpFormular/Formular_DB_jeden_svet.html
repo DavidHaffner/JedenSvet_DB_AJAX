@@ -70,7 +70,6 @@
   
     <script>
       window.onload = function() {
-        var requestURI = "http://localhost:9000/echoGet";
         
         var dbService = null;
         var columnDBI = null;
@@ -98,6 +97,7 @@
         var submit = document.getElementById("submit");
         submit.onclick = function() { 
         
+            var requestURI = "http://localhost:9000/echoGet";
             requestURI += "?userName=" + userName.value
                     + "&password=" + password.value; 
                     

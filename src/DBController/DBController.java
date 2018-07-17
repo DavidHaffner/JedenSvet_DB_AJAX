@@ -14,7 +14,7 @@ import java.sql.*;
  */
 public class DBController implements IDBController {
 
-    public final String DB_PATH = "jdbc:mysql://localhost:3306/jeden_svet?user=root&password=chelsea";
+    public final String DB_PATH = "jdbc:mysql://localhost:3306/jeden_svet?user=root&password=1111";
     MyLogger myLogger = new MyLogger();
     
 

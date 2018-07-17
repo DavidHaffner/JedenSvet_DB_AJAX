@@ -26,32 +26,32 @@ public class AJAXHandler extends ParseMessage {
         System.out.println(str);
     }
 
-    public String doDBRequest(Map<String, Object> parameters) {
+    public String doDBRequest(Map<String, String> parameters) {
 
-        boolean quit = false; // pomocná prom. pro plnění podmínek v cyklech
+        boolean validAccess = false; // prom. pro hodnotu, zdali je přístup povolen
         String dbResponse; // zde bude výsledek z DB
         String responseText =""; // zde bude odpověď zpět pro Clienta
         
         try {
-            while (!quit) {
+            
                 // ověření přístupu do DB -> z tabulky 'pristupy'
-                dbResponse = dBController.doSelectFromPristupy((String)parameters.get("userName"));
+                dbResponse = dBController.doSelectFromPristupy(parameters.get("userName"));
 
-                if (dbResponse.equals((String)parameters.get("password"))) {
-                    responseText += "Ověření OK...\n";
-                    quit = true;
+                if (dbResponse.equals(parameters.get("password"))) {
+                    responseText += "Ověření OK...<br>";
+                    validAccess = true;
                 } else {
-                    responseText += "Nepovolený vstup...\n";
+                    responseText += "Nepovolený vstup...<br>";
                 }
-            }
+            
         } catch (Exception ex) {
             myLogger.saveLog(AJAXHandler.class.getName(), "Chyba v ClientHandleru - při přihlašování.", ex);
             //Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, "Error in ClientHandler - signing in.", ex);
         }
 
         try {
-            quit = false;
-            while (!quit) {
+            
+            if (validAccess) {
 
                 // pro zjednodušení předpokládáme, že druhá strana zná schéma, které má poslat
                 // 1-insert:  1/jménoFilmu/rok/režisér/popis
@@ -62,16 +62,16 @@ public class AJAXHandler extends ParseMessage {
                 String[] filmData = {"", "", "", "", ""};
                 int radku;
 
-                switch ((String)parameters.get("dbService")) {
+                switch (parameters.get("dbService")) {
                     case "1":
                         if (! (parameters.size() == 7)) {
                             dbResponse = "Chybné zadání.";
                             break;
                         }
-                        radku = dBController.doInsertToFilm((String)parameters.get("movieName"),
-                                (String)parameters.get("year"), 
-                                (String)parameters.get("director"), 
-                                (String)parameters.get("description"));
+                        radku = dBController.doInsertToFilm(parameters.get("movieName"),
+                                parameters.get("year"), 
+                                parameters.get("director"), 
+                                parameters.get("description"));
                         dbResponse = "Vloženo řádků: " + Integer.toString(radku);
                         break;
                     case "2":
@@ -79,7 +79,7 @@ public class AJAXHandler extends ParseMessage {
                             dbResponse = "Chybné zadání.";
                             break;
                         }
-                        filmData[Integer.parseInt((String)parameters.get("columnDB")) - 1] = (String)parameters.get("insertValue");
+                        filmData[Integer.parseInt(parameters.get("columnDB")) - 1] = parameters.get("insertValue");
                         dbResponse = dBController.doSelectFromFilm(filmData[1], filmData[2], filmData[3], filmData[4]);
                         // hláška při nenalezení záznamu
                         if ("".equals(dbResponse)) {
@@ -91,16 +91,15 @@ public class AJAXHandler extends ParseMessage {
                             dbResponse = "Chybné zadání.";
                             break;
                         }
-                        filmData[Integer.parseInt((String)parameters.get("columnDB")) - 1] = (String)parameters.get("updateValue");
-                        radku = dBController.doUpdateToFilm((String)parameters.get("movieID"), filmData[1], filmData[2], filmData[3], filmData[4]);
+                        filmData[Integer.parseInt(parameters.get("columnDB")) - 1] = parameters.get("updateValue");
+                        radku = dBController.doUpdateToFilm(parameters.get("movieID"), filmData[1], filmData[2], filmData[3], filmData[4]);
                         dbResponse = "Upraveno řádků: " + Integer.toString(radku);
                         break;
                     default:
                         dbResponse = "Chybné zadání.";
                 }
-                responseText += dbResponse + "\n";
+                responseText += dbResponse + "<br>";
 
-                quit = true;
             } 
         } catch (Exception ex) {
             myLogger.saveLog(AJAXHandler.class.getName(), "Chyba v ClientHandleru - při běhu aplikace.", ex);

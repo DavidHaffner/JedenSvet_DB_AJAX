@@ -1,0 +1,5 @@
+Čvc 17, 2018 9:02:43 ODP. MyLogger.MyLogger saveLog
+SEVERE: Chyba při komunikaci s databází - ověření přístupu.
+zadáno přístupové jméno: jmeno
+java.sql.SQLException: No suitable driver found for jdbc:mysql://localhost:3306/jeden_svet?user=root&password=1111
+

@@ -82,7 +82,7 @@ public class HttpServerBase {
         @Override
         public void handle(com.sun.net.httpserver.HttpExchange httpExch) throws IOException {
             // parse request to map
-            Map<String, Object> parameters = new HashMap<>();
+            Map<String, String> parameters = new HashMap<>();
             URI requestedUri = httpExch.getRequestURI();
             String query = requestedUri.getRawQuery();
             parseQuery(query, parameters);
@@ -115,7 +115,7 @@ public class HttpServerBase {
         @Override
         public void handle(com.sun.net.httpserver.HttpExchange he) throws IOException {
             // parse request
-            Map<String, Object> parameters = new HashMap<>();
+            Map<String, String> parameters = new HashMap<>();
             InputStreamReader isr = new InputStreamReader(he.getRequestBody(), "utf-8");
             BufferedReader br = new BufferedReader(isr);
             String query = br.readLine();
@@ -128,10 +128,10 @@ public class HttpServerBase {
             OutputStream os = he.getResponseBody();
             os.write(response.getBytes());
             os.close();
-        }
     }
 
-    public static void parseQuery(String query, Map<String, Object> parameters) throws UnsupportedEncodingException {
+        }
+    public static void parseQuery(String query, Map<String, String> parameters) throws UnsupportedEncodingException {
 
         if (query != null) {
             String pairs[] = query.split("[&]");
@@ -149,6 +149,7 @@ public class HttpServerBase {
                             System.getProperty("file.encoding"));
                 }
 
+                /*
                 if (parameters.containsKey(key)) {
                     Object obj = parameters.get(key);
                     if (obj instanceof List<?>) {
@@ -161,9 +162,9 @@ public class HttpServerBase {
                         values.add(value);
                         parameters.put(key, values);
                     }
-                } else {
+                } else {                                */
                     parameters.put(key, value);
-                }
+                
             }
         }
     }

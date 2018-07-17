@@ -28,7 +28,7 @@ public class MyLogger {
             logger = Logger.getLogger("Třída " + className);
             
             // konfigurace loggeru přes handler a formatter  
-            fh = new FileHandler("C:/temp/JedenSvetLog.log");
+            fh = new FileHandler("C:/Users/Student/Documents/NetBeansProjects/JedenSvet_DB_AJAX/JedenSvetLog.log");
             logger.addHandler(fh);
             SimpleFormatter formatter = new SimpleFormatter();
             fh.setFormatter(formatter);

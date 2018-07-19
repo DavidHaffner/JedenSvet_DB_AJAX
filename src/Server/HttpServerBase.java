@@ -98,9 +98,12 @@ public class HttpServerBase {
             }
             */
 
-            httpExch.sendResponseHeaders(200, response.length());
+            httpExch.sendResponseHeaders(200, response.getBytes().length);
             OutputStream os = httpExch.getResponseBody();
             os.write(response.getBytes());
+            
+            
+            
 
             os.close();
         }
